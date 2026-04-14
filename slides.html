@@ -1,0 +1,540 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CitableRank｜AI讚聲 — 服務簡報</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/reveal.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/theme/black.css">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&display=swap');
+
+  :root {
+    --purple: #7C3AED;
+    --purple-light: #A78BFA;
+    --purple-dark: #4C1D95;
+    --amber: #F59E0B;
+    --green: #10B981;
+  }
+
+  .reveal {
+    font-family: 'Noto Sans TC', 'PingFang TC', sans-serif;
+  }
+
+  /* ── 全域覆寫 ── */
+  .reveal .slides section {
+    text-align: left;
+  }
+  .reveal h1, .reveal h2, .reveal h3 {
+    font-family: 'Noto Sans TC', sans-serif;
+    text-transform: none;
+    letter-spacing: -0.02em;
+  }
+  .reveal h1 { font-size: 2.4em; font-weight: 900; }
+  .reveal h2 { font-size: 1.7em; font-weight: 800; }
+  .reveal h3 { font-size: 1.2em; font-weight: 700; }
+  .reveal p  { font-size: 0.85em; line-height: 1.7; }
+  .reveal a  { color: var(--purple-light); }
+
+  /* ── 封面 ── */
+  .cover-slide {
+    background: linear-gradient(135deg, #0F0F1A 0%, #1E1040 60%, #0F0F1A 100%) !important;
+    text-align: center !important;
+  }
+  .cover-slide::before {
+    content: '';
+    position: absolute;
+    width: 500px; height: 500px;
+    background: radial-gradient(circle, rgba(124,58,237,0.35) 0%, transparent 70%);
+    top: -80px; right: -80px;
+    pointer-events: none;
+  }
+  .brand-name {
+    font-size: 2.6em;
+    font-weight: 900;
+    color: #fff;
+    margin-bottom: 2px;
+  }
+  .brand-name span { color: #A78BFA; }
+  .brand-sub {
+    font-size: 0.9em;
+    color: #A78BFA;
+    font-weight: 500;
+    margin-bottom: 18px;
+  }
+  .cover-tagline {
+    font-size: 1.15em;
+    font-weight: 700;
+    color: #fff;
+    line-height: 1.4;
+    margin-bottom: 16px;
+  }
+  .cover-desc {
+    font-size: 0.7em;
+    color: #9CA3AF;
+    line-height: 1.7;
+    margin-bottom: 14px;
+  }
+  .cover-url {
+    display: inline-block;
+    font-size: 0.8em;
+    font-weight: 700;
+    color: #A78BFA;
+    text-decoration: none;
+    border: 1px solid rgba(167,139,250,0.4);
+    padding: 5px 18px;
+    border-radius: 999px;
+    margin-bottom: 20px;
+  }
+  .stat-row {
+    display: flex;
+    justify-content: center;
+    gap: 48px;
+    margin-top: 4px;
+  }
+  .stat-num { font-size: 1.8em; font-weight: 900; color: #A78BFA; display: block; }
+  .stat-label { font-size: 0.6em; color: #6B7280; display: block; }
+
+  /* ── 通用標籤 ── */
+  .label {
+    display: inline-block;
+    font-size: 0.55em;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    color: #A78BFA;
+    text-transform: uppercase;
+    border-bottom: 2px solid #A78BFA;
+    padding-bottom: 2px;
+    margin-bottom: 14px;
+  }
+
+  /* ── 黃色高亮 ── */
+  .hl { color: #A78BFA; font-weight: 700; }
+  .hl-amber { color: var(--amber); font-weight: 700; }
+  .hl-green { color: var(--green); font-weight: 700; }
+
+  /* ── intro box ── */
+  .intro-box {
+    background: rgba(124,58,237,0.15);
+    border-left: 4px solid #7C3AED;
+    border-radius: 8px;
+    padding: 16px 20px;
+    font-size: 0.78em;
+    color: #DDD6FE;
+    line-height: 1.8;
+    margin-bottom: 20px;
+  }
+
+  /* ── 功能卡片 ── */
+  .card-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px;
+    margin-top: 20px;
+  }
+  .card-grid-3 {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    margin-top: 20px;
+  }
+  .card {
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.12);
+    border-radius: 12px;
+    padding: 16px;
+  }
+  .card-icon { font-size: 1.4em; display: block; margin-bottom: 6px; }
+  .card-title { font-size: 0.72em; font-weight: 700; color: #fff; margin-bottom: 4px; }
+  .card-desc { font-size: 0.6em; color: #9CA3AF; line-height: 1.5; }
+  .card-tag {
+    display: inline-block;
+    margin-top: 8px;
+    font-size: 0.55em;
+    font-weight: 600;
+    padding: 2px 8px;
+    border-radius: 999px;
+    background: rgba(124,58,237,0.3);
+    color: #C4B5FD;
+  }
+
+  /* ── 步驟 ── */
+  .step-list { list-style: none; margin: 0; padding: 0; }
+  .step-list li {
+    display: flex;
+    gap: 16px;
+    align-items: flex-start;
+    padding: 14px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+    font-size: 0.78em;
+  }
+  .step-list li:last-child { border-bottom: none; }
+  .step-num {
+    width: 28px; height: 28px;
+    border-radius: 50%;
+    background: var(--purple);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0.85em;
+    font-weight: 700;
+    flex-shrink: 0;
+    color: #fff;
+  }
+  .step-body strong { color: #fff; display: block; margin-bottom: 2px; font-size: 1.05em; }
+  .step-body span { color: #9CA3AF; }
+
+  /* ── 時程 ── */
+  .tl { list-style: none; padding: 0; margin: 0; }
+  .tl li {
+    display: flex;
+    gap: 20px;
+    padding: 14px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+    font-size: 0.75em;
+  }
+  .tl li:last-child { border-bottom: none; }
+  .tl-period {
+    width: 44px;
+    font-weight: 700;
+    color: #A78BFA;
+    flex-shrink: 0;
+    padding-top: 2px;
+    font-size: 0.9em;
+  }
+  .tl-body strong { color: #fff; display: block; margin-bottom: 3px; }
+  .tl-body span { color: #9CA3AF; line-height: 1.6; }
+  .badge-soon {
+    display: inline-block;
+    font-size: 0.75em;
+    background: rgba(245,158,11,0.2);
+    color: #FCD34D;
+    padding: 1px 8px;
+    border-radius: 999px;
+    margin-left: 6px;
+    font-weight: 600;
+  }
+
+  /* ── 客製化格線 ── */
+  .custom-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    margin-top: 16px;
+  }
+  .custom-item {
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 10px;
+    padding: 14px;
+  }
+  .custom-icon { font-size: 1.2em; margin-bottom: 5px; display: block; }
+  .custom-title { font-size: 0.68em; font-weight: 700; color: #fff; margin-bottom: 3px; }
+  .custom-desc { font-size: 0.58em; color: #9CA3AF; line-height: 1.5; }
+
+  /* ── CTA 最後一張 ── */
+  .cta-slide {
+    background: linear-gradient(135deg, #4C1D95, #7C3AED) !important;
+    text-align: center !important;
+  }
+  .cta-slide h2 { color: #fff; }
+  .cta-url-big {
+    display: inline-block;
+    font-size: 1.4em;
+    font-weight: 900;
+    color: #fff;
+    text-decoration: none;
+    margin: 16px 0;
+    border-bottom: 2px solid rgba(255,255,255,0.5);
+    padding-bottom: 4px;
+  }
+  .cta-btn-row { display: flex; justify-content: center; gap: 16px; margin-top: 24px; }
+  .btn-white {
+    display: inline-block;
+    background: #fff;
+    color: #7C3AED;
+    font-weight: 700;
+    padding: 10px 28px;
+    border-radius: 8px;
+    font-size: 0.78em;
+    text-decoration: none;
+  }
+  .btn-outline {
+    display: inline-block;
+    border: 2px solid rgba(255,255,255,0.5);
+    color: #fff;
+    font-weight: 700;
+    padding: 10px 28px;
+    border-radius: 8px;
+    font-size: 0.78em;
+    text-decoration: none;
+  }
+
+  /* 深色背景調整 */
+  .reveal .slide-background { background: #0F0F1A; }
+</style>
+</head>
+<body>
+<div class="reveal">
+<div class="slides">
+
+<!-- ══ 01 封面 ══ -->
+<section class="cover-slide" data-background="#0F0F1A">
+  <div class="brand-name">Citable<span>Rank</span></div>
+  <div class="brand-sub">AI讚聲 — AI 時代的品牌能見度平台</div>
+  <div class="cover-tagline">讓 ChatGPT、Gemini、Claude<br>在回答問題時主動推薦你</div>
+  <div class="cover-desc">
+    台灣首個繁體中文 AEO 分析平台<br>
+    協助品牌掌握 AI 搜尋能見度，持續優化被引用的機率
+  </div>
+  <a class="cover-url" href="https://citablerank.com" target="_blank">🌐 citablerank.com</a>
+  <div class="stat-row">
+    <div><span class="stat-num">5</span><span class="stat-label">AI 平台同步分析</span></div>
+    <div><span class="stat-num">15+</span><span class="stat-label">GEO 健檢指標</span></div>
+    <div><span class="stat-num">100</span><span class="stat-label">品牌健檢滿分</span></div>
+  </div>
+</section>
+
+<!-- ══ 02 為什麼需要 AEO ══ -->
+<section data-background="#0F0F1A">
+  <div class="label">為什麼需要 AEO</div>
+  <h2>Google 時代，你拼排名。<br>AI 時代，<span class="hl">你要被引用。</span></h2>
+  <div class="intro-box">
+    📌 <strong>AEO（Answer Engine Optimization）</strong>是繼 SEO 之後最重要的數位行銷趨勢。<br>
+    當消費者對 ChatGPT 說「幫我推薦一家室內設計公司」，你的品牌有沒有在 AI 的答案裡，<br>
+    直接決定你能不能被看見。
+  </div>
+  <div class="card-grid-3" style="margin-top:10px;">
+    <div class="card">
+      <span class="card-icon">🔍</span>
+      <div class="card-title">傳統 SEO</div>
+      <div class="card-desc">Google 關鍵字排名<br>點擊進你的網站</div>
+    </div>
+    <div class="card" style="border-color:#7C3AED; background:rgba(124,58,237,0.1);">
+      <span class="card-icon">🤖</span>
+      <div class="card-title" style="color:#A78BFA;">AEO（現在）</div>
+      <div class="card-desc">AI 直接回答問題<br><strong style="color:#C4B5FD;">有沒有提到你的品牌</strong></div>
+    </div>
+    <div class="card">
+      <span class="card-icon">📈</span>
+      <div class="card-title">趨勢</div>
+      <div class="card-desc">AI 搜尋正在取代<br>傳統搜尋引擎</div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ 03 現有功能（上）── -->
+<section data-background="#0F0F1A">
+  <div class="label">【1】現在已有功能</div>
+  <h2>完整上線，即開即用</h2>
+  <div class="card-grid">
+    <div class="card">
+      <span class="card-icon">🤖</span>
+      <div class="card-title">跨平台 AI 能見度分析</div>
+      <div class="card-desc">同時向 ChatGPT、Gemini、Claude、Perplexity、Grok 發問，換算成讚聲指數</div>
+      <span class="card-tag">5 大 AI 平台</span>
+    </div>
+    <div class="card">
+      <span class="card-icon">📊</span>
+      <div class="card-title">競品追蹤與雷達圖</div>
+      <div class="card-desc">同步分析競品被 AI 提及狀況，雷達圖與橫條比較圖直覺呈現</div>
+      <span class="card-tag">競品比較</span>
+    </div>
+    <div class="card">
+      <span class="card-icon">🛡️</span>
+      <div class="card-title">GEO 健檢（15 項）</div>
+      <div class="card-desc">掃描最多 8 頁，檢查 Schema、robots.txt、llms.txt、FAQ 等，給出 100 分報告</div>
+      <span class="card-tag">技術面診斷</span>
+    </div>
+    <div class="card">
+      <span class="card-icon">💡</span>
+      <div class="card-title">GEO 優化建議</div>
+      <div class="card-desc">健檢後自動生成優先改善清單，提供具體建議與 Schema 範例</div>
+      <span class="card-tag">改善行動方案</span>
+    </div>
+  </div>
+</section>
+
+<!-- ══ 04 現有功能（下）── -->
+<section data-background="#0F0F1A">
+  <div class="label">【1】現在已有功能</div>
+  <h2>完整上線，即開即用</h2>
+  <div class="card-grid">
+    <div class="card">
+      <span class="card-icon">✨</span>
+      <div class="card-title">AI 自動生成分析問題</div>
+      <div class="card-desc">填入品牌資訊後，AI 自動生成目標受眾最可能問的問題，可直接勾選</div>
+      <span class="card-tag">智慧建議</span>
+    </div>
+    <div class="card">
+      <span class="card-icon">🏢</span>
+      <div class="card-title">多品牌管理</div>
+      <div class="card-desc">一個帳號同時管理多個品牌或客戶，各品牌獨立報告與健檢歷史</div>
+      <span class="card-tag">代理商適用</span>
+    </div>
+    <div class="card">
+      <span class="card-icon">📋</span>
+      <div class="card-title">完整報告 + PDF 匯出</div>
+      <div class="card-desc">完整保留歷史，展開看各 AI 完整回答，一鍵匯出 PDF 報告</div>
+      <span class="card-tag">報告即交付</span>
+    </div>
+    <div class="card">
+      <span class="card-icon">📈</span>
+      <div class="card-title">分析歷史與紀錄追蹤</div>
+      <div class="card-desc">保留每次 AI 能見度分析與 GEO 健檢紀錄，確認優化策略是否有效</div>
+      <span class="card-tag">歷史追蹤</span>
+    </div>
+  </div>
+</section>
+
+<!-- ══ 05 三步驟 ══ -->
+<section data-background="#0F0F1A">
+  <div class="label">實際操作流程</div>
+  <h2>三步驟，掌握品牌 AI 能見度</h2>
+  <p style="color:#9CA3AF; font-size:0.78em;">不需要技術背景，品牌主理人、行銷顧問、代理商都可以直接上手</p>
+  <ul class="step-list">
+    <li class="fragment">
+      <div class="step-num">1</div>
+      <div class="step-body">
+        <strong>建立品牌檔案</strong>
+        <span>輸入品牌名稱、網址、產業、競品名稱，系統自動生成專屬分析問題</span>
+      </div>
+    </li>
+    <li class="fragment">
+      <div class="step-num">2</div>
+      <div class="step-body">
+        <strong>選擇 AI 平台，一鍵啟動分析</strong>
+        <span>勾選要測試的 AI 平台，系統同步向各 AI 發問並彙整結果</span>
+      </div>
+    </li>
+    <li class="fragment">
+      <div class="step-num">3</div>
+      <div class="step-body">
+        <strong>看報告、找缺口、調整優化方向</strong>
+        <span>報告顯示哪些 AI 提到你、競品被提及幾次，AI 改善建議直接告訴你下一步</span>
+      </div>
+    </li>
+  </ul>
+</section>
+
+<!-- ══ 06 短期規劃 ══ -->
+<section data-background="#0F0F1A">
+  <div class="label">【2】短期規劃（5–6 月）</div>
+  <h2>持續進化，<span class="hl">功能密集推出中</span></h2>
+  <p style="color:#9CA3AF; font-size:0.72em;">以下功能預計 5–6 月陸續上線，現有用戶全部免費升級</p>
+  <ul class="tl">
+    <li class="fragment">
+      <div class="tl-period">5 月</div>
+      <div class="tl-body">
+        <strong>長期趨勢追蹤 <span class="badge-soon">開發中</span></strong>
+        <span>定期記錄 CitableRank Score，自動生成趨勢折線圖，對比競品掌握消長動態</span>
+      </div>
+    </li>
+    <li class="fragment">
+      <div class="tl-period">5 月</div>
+      <div class="tl-body">
+        <strong>訂閱金流開通 <span class="badge-soon">開發中</span></strong>
+        <span>支援信用卡、Apple Pay、Google Pay；月繳 / 年繳彈性選擇</span>
+      </div>
+    </li>
+    <li class="fragment">
+      <div class="tl-period">6 月</div>
+      <div class="tl-body">
+        <strong>AI 內容優化建議（小編助手）<span class="badge-soon">規劃中</span></strong>
+        <span>根據分析結果直接生成網頁內容草稿，FAQ 文案、Schema 範例一次給齊</span>
+      </div>
+    </li>
+    <li class="fragment">
+      <div class="tl-period">6 月</div>
+      <div class="tl-body">
+        <strong>定期自動分析報告 <span class="badge-soon">規劃中</span></strong>
+        <span>系統每週 / 每月自動執行分析並寄送報告，品牌監測變成例行作業</span>
+      </div>
+    </li>
+  </ul>
+</section>
+
+<!-- ══ 07 客製化功能 ══ -->
+<section data-background="#0F0F1A">
+  <div class="label">【3】可配合客戶需求客製化</div>
+  <h2>你的業務需求，<span class="hl">我們量身打造</span></h2>
+  <div class="custom-grid">
+    <div class="custom-item fragment">
+      <span class="custom-icon">🏷️</span>
+      <div class="custom-title">白標報告（White-label）</div>
+      <div class="custom-desc">換上客戶 Logo 與品牌色，直接作為顧問交付成果</div>
+    </div>
+    <div class="custom-item fragment">
+      <span class="custom-icon">🔗</span>
+      <div class="custom-title">系統 API 串接</div>
+      <div class="custom-desc">分析數據串進 CRM、GA4、行銷自動化工具</div>
+    </div>
+    <div class="custom-item fragment">
+      <span class="custom-icon">🌐</span>
+      <div class="custom-title">多語系市場分析</div>
+      <div class="custom-desc">英文、日文、韓文市場 AI 能見度同步追蹤</div>
+    </div>
+    <div class="custom-item fragment">
+      <span class="custom-icon">🎯</span>
+      <div class="custom-title">產業專屬問題庫</div>
+      <div class="custom-desc">旅宿、餐飲、醫療、電商、B2B 專屬分析問題</div>
+    </div>
+    <div class="custom-item fragment">
+      <span class="custom-icon">📣</span>
+      <div class="custom-title">AI 品牌輿情預警</div>
+      <div class="custom-desc">AI 回答出現負面敘述時即時通知</div>
+    </div>
+    <div class="custom-item fragment">
+      <span class="custom-icon">✍️</span>
+      <div class="custom-title">內容生產整合</div>
+      <div class="custom-desc">AEO 缺口自動生成部落格草稿、FAQ 文案</div>
+    </div>
+    <div class="custom-item fragment">
+      <span class="custom-icon">🏢</span>
+      <div class="custom-title">代理商批次管理</div>
+      <div class="custom-desc">大量客戶品牌批次分析、統一帳務與報告</div>
+    </div>
+    <div class="custom-item fragment">
+      <span class="custom-icon">📅</span>
+      <div class="custom-title">自動化報告排程</div>
+      <div class="custom-desc">每週 / 每月自動執行健檢並寄送報告</div>
+    </div>
+    <div class="custom-item fragment">
+      <span class="custom-icon">📦</span>
+      <div class="custom-title">私有部署</div>
+      <div class="custom-desc">資料不出境，部署於客戶自有雲端環境</div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ 08 CTA ══ -->
+<section class="cta-slide" data-background="linear-gradient(135deg, #4C1D95, #7C3AED)">
+  <h2 style="color:#fff; text-align:center;">準備好讓 AI<br>幫你讚聲了嗎？</h2>
+  <p style="color:#DDD6FE; text-align:center; margin-top:12px;">現在即可免費試用，無需信用卡。<br>有興趣進一步討論合作方式，隨時聯繫。</p>
+  <div style="text-align:center; margin-top:20px;">
+    <a class="cta-url-big" href="https://citablerank.com" target="_blank">citablerank.com</a>
+  </div>
+  <div class="cta-btn-row">
+    <a class="btn-white" href="https://citablerank.com" target="_blank">立即免費試用</a>
+    <a class="btn-outline" href="mailto:rai0603@gmail.com">聯繫合作洽談</a>
+  </div>
+</section>
+
+</div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/reveal.js"></script>
+<script>
+  Reveal.initialize({
+    hash: true,
+    transition: 'fade',
+    transitionSpeed: 'fast',
+    controls: true,
+    progress: true,
+    slideNumber: 'c/t',
+    center: false,
+    margin: 0.06,
+    keyboard: true,
+    overview: true,
+  });
+</script>
+</body>
+</html>
