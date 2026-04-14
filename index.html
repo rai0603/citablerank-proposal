@@ -1,0 +1,655 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CitableRank｜AI讚聲 — 服務提案</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;600;700;900&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --purple: #7C3AED;
+    --purple-light: #EDE9FE;
+    --purple-mid: #A78BFA;
+    --dark: #0F0F1A;
+    --gray: #6B7280;
+    --light: #F9FAFB;
+    --border: #E5E7EB;
+    --green: #10B981;
+    --amber: #F59E0B;
+  }
+
+  body {
+    font-family: 'Noto Sans TC', 'PingFang TC', sans-serif;
+    background: #fff;
+    color: var(--dark);
+    font-size: 14px;
+    line-height: 1.7;
+  }
+
+  /* ── 封面頁 ── */
+  .cover {
+    min-height: 100vh;
+    background: linear-gradient(135deg, #0F0F1A 0%, #1E1040 50%, #0F0F1A 100%);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    padding: 60px 40px;
+    position: relative;
+    overflow: hidden;
+  }
+  .cover::before {
+    content: '';
+    position: absolute;
+    width: 600px; height: 600px;
+    background: radial-gradient(circle, rgba(124,58,237,0.3) 0%, transparent 70%);
+    top: -100px; right: -100px;
+  }
+  .cover::after {
+    content: '';
+    position: absolute;
+    width: 400px; height: 400px;
+    background: radial-gradient(circle, rgba(124,58,237,0.2) 0%, transparent 70%);
+    bottom: -80px; left: -80px;
+  }
+  .cover-badge {
+    display: inline-block;
+    background: rgba(124,58,237,0.3);
+    border: 1px solid rgba(167,139,250,0.5);
+    color: #C4B5FD;
+    padding: 6px 20px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    margin-bottom: 32px;
+    position: relative;
+    z-index: 1;
+  }
+  .cover-logo {
+    font-size: 48px;
+    font-weight: 900;
+    color: #fff;
+    margin-bottom: 8px;
+    position: relative;
+    z-index: 1;
+  }
+  .cover-logo span { color: #A78BFA; }
+  .cover-subtitle {
+    font-size: 20px;
+    color: #C4B5FD;
+    font-weight: 500;
+    margin-bottom: 40px;
+    position: relative;
+    z-index: 1;
+  }
+  .cover-tagline {
+    font-size: 28px;
+    font-weight: 700;
+    color: #fff;
+    max-width: 560px;
+    line-height: 1.4;
+    margin-bottom: 20px;
+    position: relative;
+    z-index: 1;
+  }
+  .cover-desc {
+    font-size: 15px;
+    color: #9CA3AF;
+    max-width: 500px;
+    position: relative;
+    z-index: 1;
+  }
+  .cover-url {
+    margin-top: 16px;
+    font-size: 13px;
+    color: #A78BFA;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    position: relative;
+    z-index: 1;
+  }
+  .cover-divider {
+    width: 60px; height: 3px;
+    background: linear-gradient(90deg, var(--purple), var(--purple-mid));
+    border-radius: 999px;
+    margin: 32px auto;
+    position: relative;
+    z-index: 1;
+  }
+  .cover-stat { text-align: center; }
+  .cover-stat-num { font-size: 28px; font-weight: 900; color: #A78BFA; }
+  .cover-stat-label { font-size: 11px; color: #6B7280; margin-top: 2px; }
+
+  /* ── 內頁通用 ── */
+  .page {
+    max-width: 860px;
+    margin: 0 auto;
+    padding: 64px 48px;
+  }
+  @media print {
+    .page { padding: 40px; }
+    .cover { min-height: auto; padding: 80px 60px; }
+  }
+
+  .section-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    color: var(--purple);
+    text-transform: uppercase;
+    margin-bottom: 12px;
+  }
+  .section-label::before {
+    content: '';
+    display: block;
+    width: 20px; height: 2px;
+    background: var(--purple);
+    border-radius: 999px;
+  }
+
+  h2 {
+    font-size: 26px;
+    font-weight: 800;
+    line-height: 1.3;
+    margin-bottom: 8px;
+    color: var(--dark);
+  }
+  .lead {
+    font-size: 15px;
+    color: var(--gray);
+    margin-bottom: 36px;
+    max-width: 640px;
+  }
+
+  /* ── 功能卡片 ── */
+  .card-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+    margin-bottom: 36px;
+  }
+  .card {
+    border: 1.5px solid var(--border);
+    border-radius: 14px;
+    padding: 22px 24px;
+    transition: border-color 0.2s;
+  }
+  .card:hover { border-color: var(--purple-mid); }
+  .card-icon {
+    font-size: 24px;
+    margin-bottom: 10px;
+    display: block;
+  }
+  .card-title {
+    font-size: 15px;
+    font-weight: 700;
+    margin-bottom: 6px;
+    color: var(--dark);
+  }
+  .card-desc {
+    font-size: 13px;
+    color: var(--gray);
+    line-height: 1.6;
+  }
+  .card-tag {
+    display: inline-block;
+    margin-top: 10px;
+    font-size: 11px;
+    font-weight: 600;
+    padding: 2px 10px;
+    border-radius: 999px;
+    background: var(--purple-light);
+    color: var(--purple);
+  }
+
+  /* ── 功能列表 ── */
+  .feature-list {
+    list-style: none;
+    margin-bottom: 28px;
+  }
+  .feature-list li {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--border);
+    font-size: 13.5px;
+  }
+  .feature-list li:last-child { border-bottom: none; }
+  .feature-list .check {
+    flex-shrink: 0;
+    width: 18px; height: 18px;
+    background: var(--purple);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    color: #fff;
+    font-size: 10px;
+    margin-top: 1px;
+  }
+  .feature-list strong { color: var(--dark); }
+
+  /* ── 時程區塊 ── */
+  .timeline {
+    position: relative;
+    padding-left: 28px;
+    margin-bottom: 36px;
+  }
+  .timeline::before {
+    content: '';
+    position: absolute;
+    left: 7px; top: 8px; bottom: 0;
+    width: 2px;
+    background: var(--border);
+  }
+  .tl-item {
+    position: relative;
+    margin-bottom: 28px;
+  }
+  .tl-dot {
+    position: absolute;
+    left: -28px; top: 4px;
+    width: 16px; height: 16px;
+    border-radius: 50%;
+    border: 2px solid var(--purple);
+    background: #fff;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .tl-dot.filled { background: var(--purple); }
+  .tl-dot.filled::after {
+    content: '';
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: #fff;
+  }
+  .tl-period {
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--purple);
+    letter-spacing: 0.08em;
+    margin-bottom: 4px;
+  }
+  .tl-title {
+    font-size: 15px;
+    font-weight: 700;
+    margin-bottom: 6px;
+  }
+  .tl-items {
+    font-size: 13px;
+    color: var(--gray);
+    line-height: 1.8;
+  }
+
+  /* ── 分隔線 ── */
+  .divider {
+    border: none;
+    border-top: 1px solid var(--border);
+    margin: 40px 0;
+  }
+
+  /* ── 客製化項目 ── */
+  .custom-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    margin-bottom: 32px;
+  }
+  .custom-item {
+    background: var(--light);
+    border-radius: 10px;
+    padding: 16px;
+    border: 1px solid var(--border);
+  }
+  .custom-item-icon { font-size: 20px; margin-bottom: 6px; }
+  .custom-item-title { font-size: 13px; font-weight: 700; margin-bottom: 4px; }
+  .custom-item-desc { font-size: 12px; color: var(--gray); }
+
+  /* ── 結語 CTA ── */
+  .cta-box {
+    background: linear-gradient(135deg, #4C1D95, #7C3AED);
+    border-radius: 20px;
+    padding: 40px;
+    text-align: center;
+    color: #fff;
+    margin-top: 40px;
+  }
+  .cta-box h3 {
+    font-size: 22px;
+    font-weight: 800;
+    margin-bottom: 10px;
+  }
+  .cta-box p { font-size: 14px; color: #C4B5FD; margin-bottom: 8px; }
+  .cta-box .cta-url {
+    font-size: 16px;
+    font-weight: 700;
+    color: #fff;
+    margin-bottom: 24px;
+    display: block;
+  }
+  .cta-links { display: flex; justify-content: center; gap: 16px; flex-wrap: wrap; }
+  .cta-link {
+    display: inline-block;
+    padding: 10px 24px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 600;
+    text-decoration: none;
+  }
+  .cta-link.primary { background: #fff; color: var(--purple); }
+  .cta-link.secondary { border: 1.5px solid rgba(255,255,255,0.4); color: #fff; }
+
+  /* 分頁 */
+  .page-break { page-break-after: always; }
+
+  /* 高亮標籤 */
+  .badge {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 600;
+    padding: 2px 10px;
+    border-radius: 999px;
+    margin-left: 6px;
+    vertical-align: middle;
+  }
+  .badge.soon { background: #FEF9C3; color: #854D0E; }
+
+  .intro-box {
+    background: var(--purple-light);
+    border-left: 4px solid var(--purple);
+    border-radius: 8px;
+    padding: 18px 22px;
+    margin-bottom: 32px;
+    font-size: 14px;
+    color: #4C1D95;
+    line-height: 1.8;
+  }
+</style>
+</head>
+<body>
+
+<!-- ══════════════════════════════════════
+     封面頁
+══════════════════════════════════════ -->
+<div class="cover">
+  <div class="cover-badge">AEO · AI 能見度分析 · GEO 網站健檢</div>
+  <div class="cover-logo">Citable<span>Rank</span></div>
+  <div class="cover-subtitle">AI讚聲 — AI 時代的品牌能見度平台</div>
+  <div class="cover-divider"></div>
+  <div class="cover-tagline">讓 ChatGPT、Gemini、Claude<br>在回答問題時主動推薦你</div>
+  <div class="cover-desc">台灣首個繁體中文 AEO 分析平台<br>協助品牌主理人與行銷團隊掌握 AI 搜尋能見度<br>持續優化內容被 AI 引用的機率</div>
+  <div class="cover-url">🌐 citablerank.com</div>
+  <div class="cover-divider"></div>
+  <div style="position:relative;z-index:1;display:flex;gap:48px;">
+    <div class="cover-stat"><div class="cover-stat-num">5</div><div class="cover-stat-label">AI 平台同步分析</div></div>
+    <div class="cover-stat"><div class="cover-stat-num">15+</div><div class="cover-stat-label">GEO 健檢指標</div></div>
+    <div class="cover-stat"><div class="cover-stat-num">100</div><div class="cover-stat-label">品牌健檢滿分</div></div>
+  </div>
+</div>
+
+<div class="page-break"></div>
+
+<!-- ══════════════════════════════════════
+     第一頁：背景 + 現有功能
+══════════════════════════════════════ -->
+<div class="page">
+
+  <div class="section-label">為什麼需要 AEO</div>
+  <h2>Google 時代，你拼排名。<br>AI 時代，你要被引用。</h2>
+  <p class="lead">
+    當消費者開始對 ChatGPT 說「幫我推薦一家室內設計公司」，你的品牌有沒有出現在 AI 的答案裡，
+    決定了你能不能被看見。CitableRank 讓你即時掌握這件事，並告訴你哪裡需要改善。
+  </p>
+
+  <div class="intro-box">
+    📌 <strong>AEO（Answer Engine Optimization，答案引擎優化）</strong>是繼 SEO 之後最重要的數位行銷趨勢。
+    你的品牌在 AI 搜尋引擎中被提及的頻率，將直接影響未來的流量與訂單。
+    citablerank.com 是台灣第一個專為此設計的繁體中文分析平台，現已正式上線。
+  </div>
+
+  <!-- 現有功能 -->
+  <div class="section-label">【1】現在已有功能</div>
+  <h2>完整上線，即開即用</h2>
+  <p class="lead">以下功能皆已正式上線，登入 citablerank.com 即可立即開始使用。</p>
+
+  <div class="card-grid">
+    <div class="card">
+      <span class="card-icon">🤖</span>
+      <div class="card-title">跨平台 AI 能見度分析</div>
+      <div class="card-desc">
+        同時向 ChatGPT、Google Gemini、Claude、Perplexity、Grok 發問，
+        統計品牌被提及的次數與位置，換算成「讚聲指數（CitableRank Score）」，直覺呈現競爭現況。
+      </div>
+      <span class="card-tag">5 大 AI 平台</span>
+    </div>
+    <div class="card">
+      <span class="card-icon">📊</span>
+      <div class="card-title">競品追蹤與雷達圖</div>
+      <div class="card-desc">
+        同步分析同業競品被 AI 提及的狀況，雷達圖直覺呈現各平台優劣勢，
+        橫條比較圖讓你一眼看出與競品的差距在哪。
+      </div>
+      <span class="card-tag">競品比較</span>
+    </div>
+    <div class="card">
+      <span class="card-icon">🛡️</span>
+      <div class="card-title">GEO 健檢（15 項指標）</div>
+      <div class="card-desc">
+        掃描網站最多 8 頁，檢查 HTTPS、Schema 結構化標記、robots.txt（20 隻 AI 爬蟲）、
+        llms.txt、Sitemap、OG 標籤、FAQ、品牌一致性等，給出 100 分健檢報告。
+      </div>
+      <span class="card-tag">技術面診斷</span>
+    </div>
+    <div class="card">
+      <span class="card-icon">💡</span>
+      <div class="card-title">GEO 優化建議</div>
+      <div class="card-desc">
+        健檢完後自動生成「優先改善清單」，針對每個失分項目提供具體建議與 Schema 標記範例，
+        不需技術背景也能直接照做。
+      </div>
+      <span class="card-tag">改善行動方案</span>
+    </div>
+    <div class="card">
+      <span class="card-icon">✨</span>
+      <div class="card-title">AI 自動生成分析問題</div>
+      <div class="card-desc">
+        填入品牌資訊後，AI 自動生成「目標受眾最可能問的問題」，
+        可直接勾選使用，省去猜測受眾意圖的時間，讓分析更貼近真實市場。
+      </div>
+      <span class="card-tag">智慧建議</span>
+    </div>
+    <div class="card">
+      <span class="card-icon">🏢</span>
+      <div class="card-title">多品牌管理</div>
+      <div class="card-desc">
+        一個帳號同時管理多個品牌或客戶，各品牌獨立報告、分析紀錄、GEO 健檢歷史，
+        適合代理商、顧問公司、多角化集團使用。
+      </div>
+      <span class="card-tag">代理商適用</span>
+    </div>
+    <div class="card">
+      <span class="card-icon">📋</span>
+      <div class="card-title">完整報告 + PDF 匯出</div>
+      <div class="card-desc">
+        每次分析完整保留歷史，可展開查看各 AI 的完整回答與改善建議，
+        一鍵匯出 PDF 報告，可直接交付客戶或主管。
+      </div>
+      <span class="card-tag">報告即交付</span>
+    </div>
+    <div class="card">
+      <span class="card-icon">📈</span>
+      <div class="card-title">分析歷史與紀錄追蹤</div>
+      <div class="card-desc">
+        完整保留每次 AI 能見度分析與 GEO 健檢紀錄，
+        隨時回顧過去數據，確認優化策略是否持續發揮效果。
+      </div>
+      <span class="card-tag">歷史追蹤</span>
+    </div>
+  </div>
+
+  <hr class="divider">
+
+  <!-- 使用流程 -->
+  <div class="section-label">實際操作流程</div>
+  <h2>三步驟，掌握品牌 AI 能見度</h2>
+  <p class="lead">不需要技術背景，品牌主理人、行銷顧問、代理商都可以直接上手。</p>
+
+  <ul class="feature-list">
+    <li>
+      <span class="check">1</span>
+      <div>
+        <strong>建立品牌檔案</strong><br>
+        輸入品牌名稱、網址、產業、競品名稱、品牌描述，系統自動生成專屬分析問題
+      </div>
+    </li>
+    <li>
+      <span class="check">2</span>
+      <div>
+        <strong>選擇 AI 平台，一鍵啟動分析</strong><br>
+        勾選要測試的 AI 平台（ChatGPT、Gemini、Claude 等），平台同步向各 AI 發問並彙整結果
+      </div>
+    </li>
+    <li>
+      <span class="check">3</span>
+      <div>
+        <strong>看報告、找缺口、調整優化方向</strong><br>
+        報告顯示哪些 AI 提到你、哪些沒有、競品被提及幾次，AI 改善建議直接告訴你下一步怎麼做
+      </div>
+    </li>
+  </ul>
+
+</div>
+
+<div class="page-break"></div>
+
+<!-- ══════════════════════════════════════
+     第二頁：短期規劃 + 客製化
+══════════════════════════════════════ -->
+<div class="page">
+
+  <!-- 5–6月規劃 -->
+  <div class="section-label">【2】短期規劃（5–6 月）</div>
+  <h2>持續進化，功能密集推出中</h2>
+  <p class="lead">以下功能已進入開發階段，預計 5–6 月陸續上線，現有用戶全部免費升級。</p>
+
+  <div class="timeline">
+    <div class="tl-item">
+      <div class="tl-dot filled"></div>
+      <div class="tl-period">5 月</div>
+      <div class="tl-title">長期趨勢追蹤 <span class="badge soon">開發中</span></div>
+      <div class="tl-items">
+        定期記錄 CitableRank Score，自動生成趨勢折線圖<br>
+        一眼看出品牌優化後，AI 推薦率是否持續提升<br>
+        可同步對比競品趨勢，掌握市場消長動態
+      </div>
+    </div>
+    <div class="tl-item">
+      <div class="tl-dot filled"></div>
+      <div class="tl-period">5 月</div>
+      <div class="tl-title">訂閱金流開通 <span class="badge soon">開發中</span></div>
+      <div class="tl-items">
+        支援信用卡、Apple Pay、Google Pay<br>
+        月繳 / 年繳方案彈性選擇<br>
+        升級後立即解鎖更高分析配額與進階功能
+      </div>
+    </div>
+    <div class="tl-item">
+      <div class="tl-dot"></div>
+      <div class="tl-period">6 月</div>
+      <div class="tl-title">AI 內容優化建議（小編助手） <span class="badge soon">規劃中</span></div>
+      <div class="tl-items">
+        根據 AI 能見度分析結果，直接生成「提升引用率的網頁內容草稿」<br>
+        FAQ 文案、About 頁面文字、Schema 結構範例一次給齊<br>
+        大幅降低內容團隊優化 AEO 的門檻與時間成本
+      </div>
+    </div>
+    <div class="tl-item">
+      <div class="tl-dot"></div>
+      <div class="tl-period">6 月</div>
+      <div class="tl-title">定期自動分析報告 <span class="badge soon">規劃中</span></div>
+      <div class="tl-items">
+        系統自動每週 / 每月執行分析，寄送報告至指定信箱<br>
+        不需要手動操作，讓品牌能見度監測變成例行作業
+      </div>
+    </div>
+  </div>
+
+  <hr class="divider">
+
+  <!-- 客製化功能 -->
+  <div class="section-label">【3】可配合客戶需求客製化</div>
+  <h2>你的業務需求，我們量身打造</h2>
+  <p class="lead">
+    標準功能之外，我們可以配合客戶的業務規模與需求進行客製化開發。
+    以下是常見的合作方向，歡迎直接討論你的使用場景。
+  </p>
+
+  <div class="custom-grid">
+    <div class="custom-item">
+      <div class="custom-item-icon">🏷️</div>
+      <div class="custom-item-title">白標報告（White-label）</div>
+      <div class="custom-item-desc">匯出報告換上客戶 Logo 與品牌色，直接作為顧問交付成果</div>
+    </div>
+    <div class="custom-item">
+      <div class="custom-item-icon">🔗</div>
+      <div class="custom-item-title">系統 API 串接</div>
+      <div class="custom-item-desc">將分析數據串進 CRM、GA4、行銷自動化工具或自有後台</div>
+    </div>
+    <div class="custom-item">
+      <div class="custom-item-icon">🌐</div>
+      <div class="custom-item-title">多語系市場分析</div>
+      <div class="custom-item-desc">英文、日文、韓文市場的 AI 能見度同步追蹤與比較</div>
+    </div>
+    <div class="custom-item">
+      <div class="custom-item-icon">🎯</div>
+      <div class="custom-item-title">產業專屬問題庫</div>
+      <div class="custom-item-desc">針對旅宿、餐飲、醫療、電商、B2B 等產業設計專屬分析問題</div>
+    </div>
+    <div class="custom-item">
+      <div class="custom-item-icon">📣</div>
+      <div class="custom-item-title">AI 品牌輿情預警</div>
+      <div class="custom-item-desc">監測品牌在 AI 回答中是否出現負面敘述，異常時即時通知</div>
+    </div>
+    <div class="custom-item">
+      <div class="custom-item-icon">🏢</div>
+      <div class="custom-item-title">代理商批次管理</div>
+      <div class="custom-item-desc">一次管理大量客戶品牌、批次執行分析、統一帳務與報告</div>
+    </div>
+    <div class="custom-item">
+      <div class="custom-item-icon">✍️</div>
+      <div class="custom-item-title">內容生產整合</div>
+      <div class="custom-item-desc">根據 AEO 缺口自動生成部落格草稿、FAQ 文案、社群貼文建議</div>
+    </div>
+    <div class="custom-item">
+      <div class="custom-item-icon">📅</div>
+      <div class="custom-item-title">自動化報告排程</div>
+      <div class="custom-item-desc">每週 / 每月自動執行品牌健檢並寄送報告至指定收件人</div>
+    </div>
+    <div class="custom-item">
+      <div class="custom-item-icon">📦</div>
+      <div class="custom-item-title">私有部署</div>
+      <div class="custom-item-desc">資料不出境，部署於客戶自有雲端環境，適合對資安有要求的企業</div>
+    </div>
+  </div>
+
+  <!-- CTA -->
+  <div class="cta-box">
+    <h3>準備好讓 AI 幫你讚聲了嗎？</h3>
+    <p>現在即可免費試用，無需信用卡。有興趣進一步討論合作方式，隨時聯繫。</p>
+    <span class="cta-url">citablerank.com</span>
+    <div class="cta-links">
+      <a class="cta-link primary" href="https://citablerank.com">立即免費試用</a>
+      <a class="cta-link secondary" href="mailto:rai0603@gmail.com">聯繫合作洽談</a>
+    </div>
+  </div>
+
+</div>
+
+</body>
+</html>
